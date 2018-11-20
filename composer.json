@@ -3,7 +3,7 @@
     "description": "This bundle contains basic tools for development of REST API",
     "type": "symfony-bundle",
     "require": {
-        "php": "^7.1.3",
+        "php": "^7.2",
         "symfony/framework-bundle": "^4.0",
         "symfony/form": "^4.0",
         "symfony/options-resolver": "^4.0",
@@ -17,15 +17,19 @@
     },
     "require-dev": {
         "doctrine/orm": "^2.0",
-        "alcaeus/mongo-php-adapter": "^1.1",
-        "doctrine/mongodb-odm": "^1.2"
+        "symfony/yaml": "^4.1",
+        "symfony/phpunit-bridge": "^4.1"
     },
     "suggest": {
-        "doctrine/orm": "To use Doctrine entities",
-        "doctrine/mongodb-odm": "To use Doctrine objects"
+        "doctrine/orm": "To use Doctrine entities"
     },
     "autoload" : {
         "psr-4" : { "Kna\\HalBundle\\" : "" }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Kna\\HalBundle\\Tests\\App\\": "Tests/App/src/"
+        }
     },
     "license": "MIT",
     "authors": [
