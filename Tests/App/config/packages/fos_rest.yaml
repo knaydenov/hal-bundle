@@ -1,0 +1,9 @@
+fos_rest:
+    versioning:
+        enabled: true
+    serializer:
+        serialize_null: true
+        groups: ['Default']
+    format_listener:
+        rules:
+            - { path: ^/, prefer_extension: true, fallback_format: json, priorities: [ json ] }

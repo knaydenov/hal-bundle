@@ -1,0 +1,3 @@
+heroes:
+  type: rest
+  resource: Kna\HalBundle\Tests\App\Controller\HeroesController

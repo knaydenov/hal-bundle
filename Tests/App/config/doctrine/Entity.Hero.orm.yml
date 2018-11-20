@@ -1,0 +1,12 @@
+Kna\HalBundle\Tests\App\Entity\Hero:
+  type: entity
+  repositoryClass: Kna\HalBundle\Tests\App\Repository\HeroRepository
+  id:
+    id:
+      type: integer
+      generator:
+        strategy: AUTO
+
+  fields:
+    name:
+      type: string
