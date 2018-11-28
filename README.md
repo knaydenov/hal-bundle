@@ -9,3 +9,18 @@ This bundle contains basic tools for development of REST API
 ```
 composer require kna/hal-bundle
 ```
+
+## Testing
+
+Entering container
+
+```
+docker exec -it hal-bundle_php_1 sh
+```
+
+Running tests
+
+```
+./vendor/bin/simple-phpunit
+```
+
