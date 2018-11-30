@@ -8,13 +8,18 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 class ActionType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('action', ActionSelectorType::class)
+            ->add('action', ActionSelectorType::class, [
+                'constraints' => [
+                    new NotNull()
+                ]
+            ])
         ;
 
         $builder->get('action')->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
