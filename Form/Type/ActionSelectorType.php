@@ -2,7 +2,7 @@
 namespace Kna\HalBundle\Form\Type;
 
 
-use App\Form\DataTransformer\ActionToStringTransformer;
+use Kna\HalBundle\Form\DataTransformer\ActionToStringTransformer;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
