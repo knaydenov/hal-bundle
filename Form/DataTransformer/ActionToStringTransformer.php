@@ -1,5 +1,5 @@
 <?php
-namespace App\Form\DataTransformer;
+namespace Kna\HalBundle\Form\DataTransformer;
 
 
 use Kna\HalBundle\Action\ActionFactory;
