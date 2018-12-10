@@ -1,1 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?><container xmlns="http://symfony.com/schema/dic/services"           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">    <parameters>        <parameter key="kna_hal.filter_factory.class">Kna\HalBundle\Filter\FilterFactory</parameter>        <parameter key="kna_hal.filter_registry.class">Kna\HalBundle\Filter\FilterRegistry</parameter>        <parameter key="kna_hal.resolved_filter_type_factory.class">Kna\HalBundle\Filter\ResolvedFilterTypeFactory</parameter>    </parameters>    <services>        <service id="kna_hal.filter_factory" class="%kna_hal.filter_factory.class%" public="true">            <argument type="service" id="kna_hal.filter_registry" />            <argument type="service" id="form.factory" />        </service>        <service id="kna_hal.filter_registry" class="%kna_hal.filter_registry.class%" public="false">            <argument type="service" id="kna_hal.resolved_filter_type_factory" />        </service>        <service id="kna_hal.resolved_filter_type_factory" class="%kna_hal.resolved_filter_type_factory.class%" public="false" />        <service id="Kna\HalBundle\Filter\FilterFactoryInterface" alias="kna_hal.filter_factory" />    </services></container>
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="kna_hal.filter_factory.class">Kna\HalBundle\Filter\FilterFactory</parameter>
+        <parameter key="kna_hal.filter_registry.class">Kna\HalBundle\Filter\FilterRegistry</parameter>
+        <parameter key="kna_hal.resolved_filter_type_factory.class">Kna\HalBundle\Filter\ResolvedFilterTypeFactory</parameter>
+    </parameters>
+
+    <services>
+        <service id="kna_hal.filter_factory" class="%kna_hal.filter_factory.class%" public="true">
+            <argument type="service" id="kna_hal.filter_registry" />
+            <argument type="service" id="form.factory" />
+        </service>
+        <service id="kna_hal.filter_registry" class="%kna_hal.filter_registry.class%" public="false">
+            <argument type="service" id="kna_hal.resolved_filter_type_factory" />
+        </service>
+        <service id="kna_hal.resolved_filter_type_factory" class="%kna_hal.resolved_filter_type_factory.class%" public="false" />
+        <service id="Kna\HalBundle\Filter\FilterFactoryInterface" alias="kna_hal.filter_factory" />
+    </services>
+</container>
