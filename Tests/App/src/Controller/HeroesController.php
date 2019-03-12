@@ -11,22 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class HeroesController extends BaseRestController
 {
-    /**
-     * @return HeroRepository
-     */
-    protected function getHeroRepository()
-    {
-        return $this->getDoctrine()->getRepository(Hero::class);
-    }
-
     public function getHeroesAction(Request $request): Response
     {
+        /** @var HeroRepository $heroesRepository */
+        $heroesRepository = $this->getDoctrine()->getRepository(Hero::class);
         $filter = $this->createFilter(HeroFilterType::class);
         $form = $filter->getForm();
 
         $form->submit($request->query->all());
         if($form->isSubmitted() && $form->isValid()) {
-            $pager = $this->getHeroRepository()->getPager($filter);
+            $pager = $heroesRepository->getPager($filter);
             return $this->handleView(
                 $this->view(
                     $this->createRepresentation('hero.heroes', $pager, $filter->getParameters()),
@@ -35,5 +29,22 @@ class HeroesController extends BaseRestController
             );
         }
         return $this->handleView($this->view($form));
+    }
+
+    public function getHeroAction(string $hid): Response
+    {
+        if ($hid === '1000') {
+            throw $this->createAccessDeniedException('Can`t access id1000 hero.');
+        }
+        /** @var HeroRepository $heroesRepository */
+        $heroesRepository = $this->getDoctrine()->getRepository(Hero::class);
+
+        if (null === $hero = $heroesRepository->find($hid)) {
+            throw $this->createNotFoundException('Hero not found!');
+        }
+
+        return $this->handleView(
+            $this->view($hero, Response::HTTP_OK)
+        );
     }
 }
