@@ -18,7 +18,7 @@ final class JMSFormErrorHandlerPass implements CompilerPassInterface
         }
 
         $container->register('kna_hal.serializer.form_error_handler', FormErrorHandler::class)
-            ->setDecoratedService('jms_serializer.form_error_handler')
+            ->setDecoratedService('fos_rest.serializer.form_error_handler')
             ->addArgument(new Reference('kna_hal.serializer.form_error_handler.inner'))
             ->addArgument(new Reference(SerializerInterface::class));
     }
