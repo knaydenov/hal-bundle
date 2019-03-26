@@ -14,9 +14,16 @@ class VndErrorRepresentation extends BaseVndErrorRepresentation
      */
     protected $path;
 
-    public function __construct(string $message, ?string $path = null, ?int $logref = null, Relation $help = null, Relation $describes = null)
+    /**
+     * @Serializer\Expose
+     * @var array
+     */
+    protected $trace;
+
+    public function __construct(string $message, ?string $path = null, ?array $trace = null, ?int $logref = null, Relation $help = null, Relation $describes = null)
     {
         $this->path = $path;
+        $this->trace = $trace;
         parent::__construct($message, $logref, $help, $describes);
     }
 }

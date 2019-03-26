@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="kna_hal.serializer.exception_error_handler.class">Kna\HalBundle\Serializer\Normalizer\ExceptionHandler</parameter>
+        <parameter key="kna_hal.serializer.form_error_handler.class">Kna\HalBundle\Serializer\Normalizer\FormErrorHandler</parameter>
+    </parameters>
+
+    <services>
+        <service id="kna_hal.serializer.exception_error_handler" class="%kna_hal.serializer.exception_error_handler.class%">
+            <argument type="service" id="JMS\Serializer\SerializerInterface" />
+            <argument type="service" id="fos_rest.exception.messages_map" />
+            <argument></argument>
+            <tag name="jms_serializer.subscribing_handler" />
+        </service>
+
+        <service id="kna_hal.serializer.form_error_handler" class="%kna_hal.serializer.form_error_handler.class%" decorates="fos_rest.serializer.form_error_handler">
+            <argument type="service" id="kna_hal.serializer.form_error_handler.inner" />
+            <argument type="service" id="JMS\Serializer\SerializerInterface" />
+        </service>
+    </services>
+</container>
