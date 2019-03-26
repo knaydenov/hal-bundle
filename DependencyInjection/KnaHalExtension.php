@@ -32,5 +32,11 @@ class KnaHalExtension extends Extension
         $loader->load('filter.xml');
         $loader->load('representation.xml');
         $loader->load('action.xml');
+        $loader->load('jms.xml');
+
+        $container
+            ->getDefinition('kna_hal.serializer.exception_error_handler')
+            ->replaceArgument(2, $container->getParameter('kernel.debug'))
+        ;
     }
 }

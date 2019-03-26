@@ -2,20 +2,31 @@
 
 namespace Kna\HalBundle\Serializer\Normalizer;
 
-use FOS\RestBundle\Serializer\Normalizer\AbstractExceptionNormalizer;
+use FOS\RestBundle\Util\ExceptionValueMap;
 use JMS\Serializer\Context;
 use JMS\Serializer\GraphNavigator;
 use JMS\Serializer\Handler\SubscribingHandlerInterface;
 use JMS\Serializer\JsonSerializationVisitor;
 use JMS\Serializer\SerializerInterface;
 use Kna\HalBundle\Representation\VndErrorRepresentation;
+use Symfony\Component\HttpFoundation\Response;
 
-class ExceptionHandler extends AbstractExceptionNormalizer implements SubscribingHandlerInterface
+class ExceptionHandler implements SubscribingHandlerInterface
 {
     /**
      * @var SerializerInterface
      */
     private $serializer;
+
+    /**
+     * @var ExceptionValueMap
+     */
+    private $messagesMap;
+
+    /**
+     * @var bool
+     */
+    private $debug;
 
     public function __construct(
         SerializerInterface $serializer,
@@ -24,7 +35,8 @@ class ExceptionHandler extends AbstractExceptionNormalizer implements Subscribin
     )
     {
         $this->serializer = $serializer;
-        parent::__construct($messagesMap, $debug);
+        $this->messagesMap = $messagesMap;
+        $this->debug = $debug;
     }
 
     /**
@@ -62,6 +74,39 @@ class ExceptionHandler extends AbstractExceptionNormalizer implements Subscribin
     }
 
     /**
+     * Extracts the exception message.
+     *
+     * @param \Exception $exception
+     *
+     * @return string
+     */
+    protected function getExceptionTrace(\Exception $exception)
+    {
+        if ($this->debug) {
+            return array_map(function ($line) {
+                return [
+                    'file' => $line['file'],
+                    'line' => $line['line'],
+                    'function' => $line['function'],
+                ];
+            }, $exception->getTrace());
+        }
+
+        return null;
+    }
+
+    protected function getExceptionMessage(\Exception $exception, $statusCode = null)
+    {
+        $showMessage = $this->messagesMap->resolveException($exception);
+
+        if ($showMessage || $this->debug) {
+            return $exception->getMessage();
+        }
+
+        return array_key_exists($statusCode, Response::$statusTexts) ? Response::$statusTexts[$statusCode] : 'error';
+    }
+
+    /**
      * @param \Exception $exception
      * @param Context    $context
      *
@@ -69,6 +114,11 @@ class ExceptionHandler extends AbstractExceptionNormalizer implements Subscribin
      */
     protected function convertToArray(\Exception $exception, Context $context)
     {
-        return json_decode($this->serializer->serialize(new VndErrorRepresentation($this->getExceptionMessage($exception, isset($statusCode) ? $statusCode : null)), 'json'), true);
+        $vndError = new VndErrorRepresentation(
+            $this->getExceptionMessage($exception, isset($statusCode) ? $statusCode : null),
+            null,
+            $this->getExceptionTrace($exception)
+        );
+        return json_decode($this->serializer->serialize($vndError, 'json'), true);
     }
 }
