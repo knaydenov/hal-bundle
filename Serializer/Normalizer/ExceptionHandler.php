@@ -85,8 +85,8 @@ class ExceptionHandler implements SubscribingHandlerInterface
         if ($this->debug) {
             return array_map(function ($line) {
                 return [
-                    'file' => $line['file'],
-                    'line' => $line['line'],
+                    'file' => $line['file'] ?? null,
+                    'line' => $line['line'] ?? null,
                     'function' => $line['function'],
                 ];
             }, $exception->getTrace());
