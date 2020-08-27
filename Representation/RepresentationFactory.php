@@ -2,7 +2,7 @@
 namespace Kna\HalBundle\Representation;
 
 
-use Doctrine\Common\Util\Inflector;
+use Doctrine\Inflector\Inflector;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\Factory\PagerfantaFactory;
@@ -21,13 +21,19 @@ class RepresentationFactory implements RepresentationFactoryInterface
     protected $pagerfantaFactory;
 
     /**
+     * @var Inflector
+     */
+    protected $inflector;
+
+    /**
      * @var RepresentationProviderInterface[]
      */
     protected $providers = [];
 
-    public function __construct()
+    public function __construct(PagerfantaFactory $pagerfantaFactory, Inflector $inflector)
     {
-        $this->pagerfantaFactory = new PagerfantaFactory();
+        $this->pagerfantaFactory = $pagerfantaFactory;
+        $this->inflector = $inflector;
     }
 
     /**
@@ -143,7 +149,7 @@ class RepresentationFactory implements RepresentationFactoryInterface
 
         $provider = $this->getProvider($providerName);
 
-        $methodName = 'create'.Inflector::classify($representationName).'Representation';
+        $methodName = 'create' . $this->inflector->classify($representationName).'Representation';
 
         if (!method_exists($provider, $methodName)) {
             throw new RepresentationNotFoundException(sprintf('Representation "%s" not found in "%s" provider', $representationName, $providerName));

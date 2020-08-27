@@ -10,7 +10,10 @@
     </parameters>
 
     <services>
-        <service id="kna_hal.representation_factory" class="%kna_hal.representation_factory.class%" public="true" />
+        <service id="kna_hal.representation_factory" class="%kna_hal.representation_factory.class%" public="true">
+            <argument type="service" id="kna_hal.pagerfanta_factory" />
+            <argument type="service" id="kna_hal.inflector" />
+        </service>
         <service id="Kna\HalBundle\Representation\RepresentationFactoryInterface" alias="kna_hal.representation_factory" />
         <service id="kna_hal.default_representation_provider" class="%kna_hal.default_representation_provider.class%">
             <argument type="service" id="kna_hal.representation_factory" />
