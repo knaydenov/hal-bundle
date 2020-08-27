@@ -18,6 +18,7 @@ class Configuration implements ConfigurationInterface
         $root
             ->children()
                 ->arrayNode('pagerfanta')
+                    ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('page_parameter_name')
                             ->defaultValue('page')
