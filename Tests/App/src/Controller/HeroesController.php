@@ -8,9 +8,15 @@ use Kna\HalBundle\Tests\App\Filter\HeroFilterType;
 use Kna\HalBundle\Tests\App\Repository\HeroRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use FOS\RestBundle\Controller\Annotations\Get;
 
 class HeroesController extends BaseRestController
 {
+    /**
+     * @Get(name="get_heroes", path="/heroes")
+     * @param Request $request
+     * @return Response
+     */
     public function getHeroesAction(Request $request): Response
     {
         /** @var HeroRepository $heroesRepository */
@@ -31,6 +37,11 @@ class HeroesController extends BaseRestController
         return $this->handleView($this->view($form));
     }
 
+    /**
+     * @Get(name="get_heroe", path="/heroes/{hid}")
+     * @param string $hid
+     * @return Response
+     */
     public function getHeroAction(string $hid): Response
     {
         if ($hid === '1000') {
