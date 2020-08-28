@@ -25,6 +25,11 @@ class HeroFilterType extends AbstractFilterType
                 ]);
         }
 
+        $builder
+            ->add('ability', TextType::class, [
+                'constraints' => [new Length(['min' => 1, 'max' => 180])]
+            ]);
+
         $builder->add('sort', SortType::class, [
                 'constraints' => [new Sort(['fields' => ['name']])],
                 'empty_data' => 'name'
@@ -32,27 +37,34 @@ class HeroFilterType extends AbstractFilterType
         ;
     }
 
-    public function buildQuery(QueryBuilder $queryBuilder, array $parameters)
+    public function buildQuery(QueryBuilder $queryBuilder, array $parameters, array $options)
     {
         $queryBuilder
             ->select('h')
             ->from(Hero::class, 'h');
 
-        if (!empty($parameters['q'])) {
+        if ($query = $parameters['q'] ?? null) {
             $queryBuilder
                 ->andWhere(
                     $queryBuilder->expr()->orX(
                         $queryBuilder->expr()->like("lower(h.name)", ':query')
                     )
                 )
-                ->setParameter('query', '%' . strtolower($parameters['q']) . '%');
+                ->setParameter('query', '%' . strtolower($query) . '%');
+        }
+
+        if ($ability = ($options['ability']) ?? $parameters['ability'] ?? null) {
+            $queryBuilder
+                ->andWhere($queryBuilder->expr()->eq("h.ability", ':ability'))
+                ->setParameter('ability', $ability);
         }
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'use_query' => false
+            'use_query' => false,
+            'ability' => null
         ]);
     }
 }

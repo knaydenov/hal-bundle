@@ -30,7 +30,7 @@ class HeroesController extends AbstractFOSRestController
     ): Response
     {
         try {
-            $filter = $filterFactory->create(HeroFilterType::class, ['use_query' => true]);
+            $filter = $filterFactory->create(HeroFilterType::class, ['use_query' => true, 'ability' => 'regeneration']);
             $filter->handleRequest($request);
 
             return $this->handleView(

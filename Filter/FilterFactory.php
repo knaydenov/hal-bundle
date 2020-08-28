@@ -40,18 +40,23 @@ class FilterFactory implements FilterFactoryInterface
     {
         $filterType = $this->filterTypeRegistry->get($type);
 
-        return new Filter($filterType, $this->createForm($filterType, $options), $this->entityManager->createQueryBuilder());
+        $options = $this->resolveOptions($filterType, $options);
+
+        return new Filter($filterType, $this->createForm($filterType, $options), $this->entityManager->createQueryBuilder(), $options);
     }
 
     private function createForm(FilterTypeInterface $filterType, array $options): FormInterface
     {
-        $optionsResolver = new OptionsResolver();
-
-        $filterType->configureOptions($optionsResolver);
-
         $formBuilder = $this->formFactory->createBuilder(FilterType::class);
-        $filterType->buildForm($formBuilder, $optionsResolver->resolve($options));
+        $filterType->buildForm($formBuilder, $options);
 
         return $formBuilder->getForm();
+    }
+
+    private function resolveOptions(FilterTypeInterface $filterType, array $options): array
+    {
+        $optionsResolver = new OptionsResolver();
+        $filterType->configureOptions($optionsResolver);
+        return $optionsResolver->resolve($options);
     }
 }
