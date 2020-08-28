@@ -24,7 +24,7 @@ class HeroesController extends BaseRestController
     public function getHeroesAction(Request $request, FilterFactoryInterface $filterFactory): Response
     {
         try {
-            $filter = $filterFactory->createFilter(HeroFilterType::class, ['use_query' => true]);
+            $filter = $filterFactory->create(HeroFilterType::class, ['use_query' => true]);
             $filter->handleRequest($request);
 
             return $this->handleView(

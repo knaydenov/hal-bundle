@@ -36,7 +36,7 @@ class FilterFactory implements FilterFactoryInterface
         $this->filterTypeRegistry = $filterTypeRegistry;
     }
 
-    public function createFilter(string $type, array $options = []): FilterInterface
+    public function create(string $type, array $options = []): FilterInterface
     {
         $filterType = $this->filterTypeRegistry->get($type);
 
