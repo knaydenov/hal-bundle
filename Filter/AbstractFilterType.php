@@ -19,7 +19,7 @@ class AbstractFilterType implements FilterTypeInterface
     {
     }
 
-    public function buildQuery(QueryBuilder $queryBuilder, array $parameters)
+    public function buildQuery(QueryBuilder $queryBuilder, array $parameters, array $options)
     {
     }
 }

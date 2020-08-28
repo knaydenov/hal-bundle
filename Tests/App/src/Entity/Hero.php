@@ -14,6 +14,11 @@ class Hero
     protected $name;
 
     /**
+     * @var string|null
+     */
+    protected $ability;
+
+    /**
      * @return int|null
      */
     public function getId(): ?int
@@ -43,5 +48,21 @@ class Hero
     public function setName(?string $name): void
     {
         $this->name = $name;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAbility(): ?string
+    {
+        return $this->ability;
+    }
+
+    /**
+     * @param string|null $ability
+     */
+    public function setAbility(?string $ability): void
+    {
+        $this->ability = $ability;
     }
 }

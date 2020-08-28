@@ -10,3 +10,5 @@ Kna\HalBundle\Tests\App\Entity\Hero:
   fields:
     name:
       type: string
+    ability:
+      type: string

@@ -23,17 +23,22 @@ class Filter implements FilterInterface
     /** @var QueryBuilder */
     private $queryBuilder;
 
+    /** @var array */
+    private $options;
+
     /**
      * Filter constructor.
      * @param FilterTypeInterface $type
      * @param FormInterface $form
      * @param QueryBuilder $queryBuilder
+     * @param array $options
      */
-    public function __construct(FilterTypeInterface $type, FormInterface $form, QueryBuilder $queryBuilder)
+    public function __construct(FilterTypeInterface $type, FormInterface $form, QueryBuilder $queryBuilder, array $options)
     {
         $this->type = $type;
         $this->form = $form;
         $this->queryBuilder = $queryBuilder;
+        $this->options = $options;
     }
 
     public function handleRequest(Request $request)
@@ -41,12 +46,13 @@ class Filter implements FilterInterface
         $this->form->submit($request->query->all());
 
         if ($this->form->isSubmitted() && $this->form->isValid()) {
-            $this->type->buildQuery($this->queryBuilder, $this->form->getData());
+            $this->type->buildQuery($this->queryBuilder, $this->form->getData(), $this->options);
             return $this;
         }
 
         throw new FormErrorsException($this->form->getErrors(true));
     }
+
     public function getPager(): PagerfantaInterface
     {
         $pagerfanta = new Pagerfanta(new QueryAdapter($this->queryBuilder));

@@ -12,5 +12,5 @@ interface FilterTypeInterface
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void;
     public function configureOptions(OptionsResolver $resolver): void;
-    public function buildQuery(QueryBuilder $queryBuilder, array $parameters);
+    public function buildQuery(QueryBuilder $queryBuilder, array $parameters, array $options);
 }
