@@ -1,5 +1,5 @@
 <?php
-namespace Kna\HalBundle\Exception;
+namespace Kna\HalBundle\Representation\Exception;
 
 
 class ProviderNotFoundException extends \RuntimeException
