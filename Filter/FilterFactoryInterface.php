@@ -6,5 +6,5 @@ namespace Kna\HalBundle\Filter;
 
 interface FilterFactoryInterface
 {
-    public function createFilter(string $type, array $options = []): FilterInterface;
+    public function create(string $type, array $options = []): FilterInterface;
 }
