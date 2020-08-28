@@ -3,6 +3,9 @@ namespace Kna\HalBundle\Tests\App\Controller;
 
 
 use Kna\HalBundle\Controller\BaseRestController;
+use Kna\HalBundle\Filter\Exception\FormErrorsException;
+use Kna\HalBundle\Filter\FilterFactoryInterface;
+use Kna\HalBundle\Representation\FormErrorRepresentation;
 use Kna\HalBundle\Tests\App\Entity\Hero;
 use Kna\HalBundle\Tests\App\Filter\HeroFilterType;
 use Kna\HalBundle\Tests\App\Repository\HeroRepository;
@@ -15,26 +18,27 @@ class HeroesController extends BaseRestController
     /**
      * @Get(name="get_heroes", path="/heroes")
      * @param Request $request
+     * @param FilterFactoryInterface $filterFactory
      * @return Response
      */
-    public function getHeroesAction(Request $request): Response
+    public function getHeroesAction(Request $request, FilterFactoryInterface $filterFactory): Response
     {
-        /** @var HeroRepository $heroesRepository */
-        $heroesRepository = $this->getDoctrine()->getRepository(Hero::class);
-        $filter = $this->createFilter(HeroFilterType::class);
-        $form = $filter->getForm();
+        try {
+            $filter = $filterFactory->createFilter(HeroFilterType::class, ['use_query' => true]);
+            $filter->handleRequest($request);
 
-        $form->submit($request->query->all());
-        if($form->isSubmitted() && $form->isValid()) {
-            $pager = $heroesRepository->getPager($filter);
             return $this->handleView(
                 $this->view(
-                    $this->createRepresentation('hero.heroes', $pager, $filter->getParameters()),
-                    Response::HTTP_OK
+                    $this->createRepresentation(
+                        'hero.heroes',
+                        $filter->getPager(),
+                        $filter->getParameters()
+                    )
                 )
             );
+        } catch (FormErrorsException $e) {
+            return $this->handleView($this->view(new FormErrorRepresentation($e->getErrors())));
         }
-        return $this->handleView($this->view($form));
     }
 
     /**

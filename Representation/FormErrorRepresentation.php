@@ -6,39 +6,22 @@ use Hateoas\Configuration\Exclusion;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Configuration\Annotation as Hateoas;
 use JMS\Serializer\Annotation as Serializer;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormErrorIterator;
 
 class FormErrorRepresentation extends CollectionRepresentation
 {
 
-    public function __construct(\ArrayObject $serializedForm, ?string $rel = null, ?string $xmlElementName = null, Exclusion $exclusion = null, Exclusion $embedExclusion = null, array $relations = array())
+    public function __construct(FormErrorIterator $formErrorIterator, ?string $rel = null, ?string $xmlElementName = null, Exclusion $exclusion = null, Exclusion $embedExclusion = null, array $relations = array())
     {
-        parent::__construct($this->resolveErrors($serializedForm, '/'), 'errors', $xmlElementName, $exclusion, $embedExclusion, $relations);
+        parent::__construct($this->generateVndErrors($formErrorIterator));
     }
 
-    /**
-     * @param \ArrayObject $serializedForm
-     * @param string $path
-     * @return array|VndErrorRepresentation[]
-     */
-    protected function resolveErrors(\ArrayObject $serializedForm, string $path): array
-    {
-        $errors = [];
-
-        if ($serializedForm->offsetExists('errors')) {
-            $errorMessages = $serializedForm->offsetGet('errors');
-            foreach ($errorMessages as $errorMessage) {
-                $errors[] = new VndErrorRepresentation($errorMessage, $path);
-            }
+    private function generateVndErrors(FormErrorIterator $formErrorIterator) {
+        /** @var FormError $error */
+        foreach ($formErrorIterator as $error) {
+            yield new VndErrorRepresentation($error->getMessage(), $error->getOrigin()->getPropertyPath());
         }
-
-        if ($serializedForm->offsetExists('children')) {
-            $children = $serializedForm->offsetGet('children');
-            foreach ($children as $name => $child) {
-                $errors = array_merge($errors, $this->resolveErrors($child, $path . $name));
-            }
-        }
-
-        return $errors;
     }
 
     /**

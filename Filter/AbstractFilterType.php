@@ -1,14 +1,17 @@
 <?php
+
+
 namespace Kna\HalBundle\Filter;
 
 
-use Kna\HalBundle\Filter\Type\FilterType;
+
+use Doctrine\ORM\QueryBuilder;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class AbstractFilterType implements FilterTypeInterface
 {
-
-    public function buildFilter(FilterBuilderInterface $builder, array $options): void
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
     }
 
@@ -16,8 +19,7 @@ class AbstractFilterType implements FilterTypeInterface
     {
     }
 
-    public function getParent(): ?string
+    public function buildQuery(QueryBuilder $queryBuilder, array $parameters)
     {
-        return FilterType::class;
     }
 }

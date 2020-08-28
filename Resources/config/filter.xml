@@ -6,19 +6,16 @@
 
     <parameters>
         <parameter key="kna_hal.filter_factory.class">Kna\HalBundle\Filter\FilterFactory</parameter>
-        <parameter key="kna_hal.filter_registry.class">Kna\HalBundle\Filter\FilterRegistry</parameter>
-        <parameter key="kna_hal.resolved_filter_type_factory.class">Kna\HalBundle\Filter\ResolvedFilterTypeFactory</parameter>
+        <parameter key="kna_hal.filter_type_registry.class">Kna\HalBundle\Filter\FilterTypeRegistry</parameter>
     </parameters>
 
     <services>
         <service id="kna_hal.filter_factory" class="%kna_hal.filter_factory.class%" public="true">
-            <argument type="service" id="kna_hal.filter_registry" />
             <argument type="service" id="form.factory" />
+            <argument type="service" id="doctrine.orm.entity_manager" />
+            <argument type="service" id="kna_hal.filter_type_registry" />
         </service>
-        <service id="kna_hal.filter_registry" class="%kna_hal.filter_registry.class%" public="false">
-            <argument type="service" id="kna_hal.resolved_filter_type_factory" />
-        </service>
-        <service id="kna_hal.resolved_filter_type_factory" class="%kna_hal.resolved_filter_type_factory.class%" public="false" />
+        <service id="kna_hal.filter_type_registry" class="%kna_hal.filter_type_registry.class%" public="true" />
         <service id="Kna\HalBundle\Filter\FilterFactoryInterface" alias="kna_hal.filter_factory" />
     </services>
 </container>

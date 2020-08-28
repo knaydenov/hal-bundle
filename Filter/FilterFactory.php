@@ -1,56 +1,57 @@
 <?php
+
+
 namespace Kna\HalBundle\Filter;
 
 
+use Doctrine\ORM\EntityManagerInterface;
 use Kna\HalBundle\Form\Type\FilterType;
 use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 class FilterFactory implements FilterFactoryInterface
 {
-    /**
-     * @var FilterRegistryInterface
-     */
-    protected $registry;
+    /** @var FormFactoryInterface */
+    private $formFactory;
+
+    /** @var EntityManagerInterface */
+    private $entityManager;
 
     /**
-     * @var FormFactoryInterface
+     * @var FilterTypeRegistryInterface
      */
-    protected $formFactory;
+    private $filterTypeRegistry;
 
-    public function __construct(FilterRegistryInterface $registry, FormFactoryInterface $formFactory)
+    /**
+     * FilterFactory constructor.
+     * @param FormFactoryInterface $formFactory
+     * @param EntityManagerInterface $entityManager
+     * @param FilterTypeRegistryInterface $filterTypeRegistry
+     */
+    public function __construct(FormFactoryInterface $formFactory, EntityManagerInterface $entityManager, FilterTypeRegistryInterface $filterTypeRegistry)
     {
-        $this->registry = $registry;
         $this->formFactory = $formFactory;
+        $this->entityManager = $entityManager;
+        $this->filterTypeRegistry = $filterTypeRegistry;
     }
 
-    public function create(string $type, array $options = []): FilterInterface
+    public function createFilter(string $type, array $options = []): FilterInterface
     {
-        return $this->createBuilder($type, $options)->getFilter();
+        $filterType = $this->filterTypeRegistry->get($type);
+
+        return new Filter($filterType, $this->createForm($filterType, $options), $this->entityManager->createQueryBuilder());
     }
 
-    public function createBuilder(string $type, array $options = []): FilterBuilderInterface
+    private function createForm(FilterTypeInterface $filterType, array $options): FormInterface
     {
-        $filterType = $this->registry->getType($type);
-        $builder = $filterType->createBuilder($this, $options);
+        $optionsResolver = new OptionsResolver();
 
-        $filterType->buildFilter($builder, $builder->getOptions());
+        $filterType->configureOptions($optionsResolver);
 
-        return $builder;
-    }
+        $formBuilder = $this->formFactory->createBuilder(FilterType::class);
+        $filterType->buildForm($formBuilder, $optionsResolver->resolve($options));
 
-    public function createForm(FilterInterface $filter, array $options = []): FormInterface
-    {
-        $formBuilder = $this->formFactory->createBuilder(
-            FilterType::class,
-            $filter,
-            array_merge($options, ['validation_groups' => ['filter']])
-        );
-        foreach ($filter->getConfig()->getFields() as $field => $fieldConfig) {
-            if ($fieldConfig->getFormType()) {
-                $formBuilder->add($field, $fieldConfig->getFormType(), $fieldConfig->getFormOptions());
-            }
-        }
         return $formBuilder->getForm();
     }
 }

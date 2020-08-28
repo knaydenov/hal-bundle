@@ -3,6 +3,7 @@ namespace Kna\HalBundle\DependencyInjection;
 
 
 use Kna\HalBundle\Action\ActionInterface;
+use Kna\HalBundle\Filter\FilterTypeInterface;
 use Kna\HalBundle\Representation\RepresentationProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -31,6 +32,11 @@ class KnaHalExtension extends Extension
         $container
             ->registerForAutoconfiguration(ActionInterface::class)
             ->addTag('kna_hal.action')
+        ;
+
+        $container
+            ->registerForAutoconfiguration(FilterTypeInterface::class)
+            ->addTag('kna_hal.filter_type')
         ;
 
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));

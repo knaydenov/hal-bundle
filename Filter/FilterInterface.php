@@ -1,15 +1,15 @@
 <?php
+
+
 namespace Kna\HalBundle\Filter;
 
 
-use Symfony\Component\Form\FormInterface;
+use Pagerfanta\PagerfantaInterface;
+use Symfony\Component\HttpFoundation\Request;
 
 interface FilterInterface
 {
-    public function get(string $field);
-    public function set(string $field, $value): FilterInterface;
-    public function has(string $field): bool;
-    public function getForm(): FormInterface;
-    public function getConfig(): FilterConfigInterface;
+    public function handleRequest(Request $request);
+    public function getPager(): PagerfantaInterface;
     public function getParameters(): array;
 }
