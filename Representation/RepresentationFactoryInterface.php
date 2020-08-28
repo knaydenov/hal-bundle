@@ -94,7 +94,7 @@ interface RepresentationFactoryInterface
      * @param array $routeParameters
      * @param $owningSideEntity
      * @param callable $wrapperFunction
-     * @param array ...$args
+     * @param mixed ...$args
      * @return PaginatedRepresentation
      */
     public function createInversesOfOwnerPaginatedRepresentation(
@@ -108,7 +108,7 @@ interface RepresentationFactoryInterface
 
     /**
      * @param string $name
-     * @param array ...$args
+     * @param mixed ...$args
      * @return mixed
      */
     public function create(string $name, ...$args);

@@ -2,13 +2,14 @@
 namespace Kna\HalBundle\Controller;
 
 
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Kna\HalBundle\Action\ActionInterface;
 use Kna\HalBundle\Form\Type\ActionType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\Post;
 
-class ActionsController extends BaseRestController
+class ActionsController extends AbstractFOSRestController
 {
     /**
      * @Post(name="post_action", path="/actions")
