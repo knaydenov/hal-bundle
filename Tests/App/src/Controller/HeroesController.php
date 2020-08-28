@@ -2,7 +2,11 @@
 namespace Kna\HalBundle\Tests\App\Controller;
 
 
-use Kna\HalBundle\Controller\BaseRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
+use Kna\HalBundle\Filter\Exception\FormErrorsException;
+use Kna\HalBundle\Filter\FilterFactoryInterface;
+use Kna\HalBundle\Representation\FormErrorRepresentation;
+use Kna\HalBundle\Representation\RepresentationFactoryInterface;
 use Kna\HalBundle\Tests\App\Entity\Hero;
 use Kna\HalBundle\Tests\App\Filter\HeroFilterType;
 use Kna\HalBundle\Tests\App\Repository\HeroRepository;
@@ -10,31 +14,37 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations\Get;
 
-class HeroesController extends BaseRestController
+class HeroesController extends AbstractFOSRestController
 {
     /**
      * @Get(name="get_heroes", path="/heroes")
      * @param Request $request
+     * @param FilterFactoryInterface $filterFactory
+     * @param RepresentationFactoryInterface $representationFactory
      * @return Response
      */
-    public function getHeroesAction(Request $request): Response
+    public function getHeroesAction(
+        Request $request,
+        FilterFactoryInterface $filterFactory,
+        RepresentationFactoryInterface $representationFactory
+    ): Response
     {
-        /** @var HeroRepository $heroesRepository */
-        $heroesRepository = $this->getDoctrine()->getRepository(Hero::class);
-        $filter = $this->createFilter(HeroFilterType::class);
-        $form = $filter->getForm();
+        try {
+            $filter = $filterFactory->create(HeroFilterType::class, ['use_query' => true]);
+            $filter->handleRequest($request);
 
-        $form->submit($request->query->all());
-        if($form->isSubmitted() && $form->isValid()) {
-            $pager = $heroesRepository->getPager($filter);
             return $this->handleView(
                 $this->view(
-                    $this->createRepresentation('hero.heroes', $pager, $filter->getParameters()),
-                    Response::HTTP_OK
+                    $representationFactory->create(
+                        'hero.heroes',
+                        $filter->getPager(),
+                        $filter->getParameters()
+                    )
                 )
             );
+        } catch (FormErrorsException $e) {
+            return $this->handleView($this->view(new FormErrorRepresentation($e->getErrors())));
         }
-        return $this->handleView($this->view($form));
     }
 
     /**

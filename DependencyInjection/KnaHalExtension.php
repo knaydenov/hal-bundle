@@ -3,6 +3,7 @@ namespace Kna\HalBundle\DependencyInjection;
 
 
 use Kna\HalBundle\Action\ActionInterface;
+use Kna\HalBundle\Filter\FilterTypeInterface;
 use Kna\HalBundle\Representation\RepresentationProviderInterface;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -33,18 +34,17 @@ class KnaHalExtension extends Extension
             ->addTag('kna_hal.action')
         ;
 
+        $container
+            ->registerForAutoconfiguration(FilterTypeInterface::class)
+            ->addTag('kna_hal.filter_type')
+        ;
+
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('filter.xml');
         $loader->load('representation.xml');
         $loader->load('action.xml');
-        $loader->load('jms.xml');
         $loader->load('pagerfanta.xml');
         $loader->load('inflector.xml');
-
-        $container
-            ->getDefinition('kna_hal.serializer.exception_error_handler')
-            ->replaceArgument(2, $container->getParameter('kernel.debug'))
-        ;
     }
 
     private function buildPagerfantaParameters(ContainerBuilder $container, array $config = []): void

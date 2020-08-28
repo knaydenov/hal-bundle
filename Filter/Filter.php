@@ -1,126 +1,85 @@
 <?php
+
+
 namespace Kna\HalBundle\Filter;
 
 
+use Doctrine\ORM\QueryBuilder;
+use Kna\HalBundle\Filter\Exception\FormErrorsException;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+use Pagerfanta\PagerfantaInterface;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class Filter implements \IteratorAggregate, FilterInterface
+class Filter implements FilterInterface
 {
-    /**
-     * @var FilterConfigInterface
-     */
-    protected $config;
+    /** @var FilterTypeInterface */
+    private $type;
+
+    /** @var FormInterface */
+    private $form;
+
+    /** @var QueryBuilder */
+    private $queryBuilder;
 
     /**
-     * @var array
+     * Filter constructor.
+     * @param FilterTypeInterface $type
+     * @param FormInterface $form
+     * @param QueryBuilder $queryBuilder
      */
-    protected $fields = [];
-
-    /**
-     * @var FormInterface
-     */
-    protected $form;
-
-    public function __construct(FilterConfigInterface $config)
+    public function __construct(FilterTypeInterface $type, FormInterface $form, QueryBuilder $queryBuilder)
     {
-        $this->config = $config;
-
-        $this->initialize();
+        $this->type = $type;
+        $this->form = $form;
+        $this->queryBuilder = $queryBuilder;
     }
 
-    public function __set($name, $value)
+    public function handleRequest(Request $request)
     {
-        $this->set($name, $value);
-    }
+        $this->form->submit($request->query->all());
 
-    public function __get($name)
-    {
-        return $this->get($name);
-    }
-
-    protected function initialize(): void
-    {
-        foreach (array_keys($this->config->getFields()) as $field) {
-            $this->add($field);
-        }
-    }
-
-    protected function add(string $field): FilterInterface
-    {
-        if (!$this->has($field)) {
-            $this->fields[$field] = null;
+        if ($this->form->isSubmitted() && $this->form->isValid()) {
+            $this->type->buildQuery($this->queryBuilder, $this->form->getData());
             return $this;
         }
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $field));
+
+        throw new FormErrorsException($this->form->getErrors(true));
     }
-
-    public function get(string $field)
+    public function getPager(): PagerfantaInterface
     {
-        if ($this->has($field)) {
-            return $this->fields[$field];
-        }
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $field));
-    }
+        $pagerfanta = new Pagerfanta(new QueryAdapter($this->queryBuilder));
+        $pagerfanta->setMaxPerPage($this->form->get('limit')->getData());
+        $pagerfanta->setCurrentPage($this->form->get('page')->getData());
 
-    public function set(string $field, $value): FilterInterface
-    {
-        if ($this->has($field)) {
-            $this->fields[$field] = $value;
-            return $this;
-        }
-        throw new \InvalidArgumentException(sprintf('Field "%s" does not exist.', $field));
-    }
-
-    public function has(string $field): bool
-    {
-        return array_key_exists($field, $this->fields);
-    }
-
-    public function getConfig(): FilterConfigInterface
-    {
-        return $this->config;
-    }
-
-    public function getForm(): FormInterface
-    {
-        if (!$this->form) {
-            $this->form = $this->config->getFilterFactory()->createForm($this, $this->config->getOption('form_options'));
-        }
-        return $this->form;
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getIterator(): \Iterator
-    {
-        foreach ($this->fields as $field => $value) {
-            if (null !== $value) {
-                yield $field => $value;
-            }
-        }
+        return $pagerfanta;
     }
 
     public function getParameters(): array
     {
         $parameters = [];
-        foreach ($this as $field => $value) {
-            if ($this->getForm()->has($field)) {
-                if ($this->getForm()->get($field)->getConfig()->getCompound()) {
-                    foreach ($this->getForm()->get($field) as $subField) {
-                        foreach ($subField->getConfig()->getViewTransformers() as $transformer) {
-                            $value[intval($subField->getName())] = $transformer->transform($value[intval($subField->getName())]);
-                        }
-                    }
-                } else {
-                    foreach ($this->getForm()->get($field)->getConfig()->getViewTransformers() as $transformer) {
-                        $value = $transformer->transform($value);
+
+        /** @var FormInterface $field */
+        foreach ($this->form as $field) {
+            $value = $field->getData();
+
+            if ($field->getConfig()->getCompound()) {
+                /** @var FormInterface $subField */
+                foreach ($field as $subField) {
+                    foreach ($subField->getConfig()->getViewTransformers() as $transformer) {
+                        $value[intval($subField->getName())] = $transformer->transform($field[intval($subField->getName())]);
                     }
                 }
-                $parameters[$field] = $value;
+            } else {
+                foreach ($field->getConfig()->getViewTransformers() as $transformer) {
+                    $value = $transformer->transform($value);
+                }
             }
+
+            $parameters[$field->getName()] = $value;
         }
+
         return $parameters;
     }
 }

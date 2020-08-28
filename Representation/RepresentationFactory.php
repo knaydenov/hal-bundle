@@ -3,14 +3,14 @@ namespace Kna\HalBundle\Representation;
 
 
 use Doctrine\Inflector\Inflector;
+use Hateoas\Configuration\Exclusion;
 use Hateoas\Configuration\Route;
 use Hateoas\Representation\CollectionRepresentation;
 use Hateoas\Representation\Factory\PagerfantaFactory;
 use Hateoas\Representation\PaginatedRepresentation;
-use Hateoas\Configuration\Exclusion;
 use Hateoas\Representation\RouteAwareRepresentation;
-use Kna\HalBundle\Exception\ProviderNotFoundException;
-use Kna\HalBundle\Exception\RepresentationNotFoundException;
+use Kna\HalBundle\Representation\Exception\ProviderNotFoundException;
+use Kna\HalBundle\Representation\Exception\RepresentationNotFoundException;
 use Pagerfanta\Pagerfanta;
 
 class RepresentationFactory implements RepresentationFactoryInterface
