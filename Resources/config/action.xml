@@ -21,5 +21,10 @@
         <service id="Kna\HalBundle\Form\DataTransformer\ActionToStringTransformer">
             <argument type="service" id="Kna\HalBundle\Action\ActionFactory" />
         </service>
+        <service id="Kna\HalBundle\Controller\ActionsController" public="true">
+            <call method="setContainer">
+                <argument type="service" id="service_container" />
+            </call>
+        </service>
     </services>
 </container>
