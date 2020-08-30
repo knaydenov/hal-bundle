@@ -71,6 +71,11 @@ class Filter implements FilterInterface
             $value = $field->getData();
 
             if ($field->getConfig()->getCompound()) {
+                // Filter empty values
+                if (empty($value)) {
+                    continue;
+                }
+
                 /** @var FormInterface $subField */
                 foreach ($field as $subField) {
                     foreach ($subField->getConfig()->getViewTransformers() as $transformer) {
@@ -78,6 +83,11 @@ class Filter implements FilterInterface
                     }
                 }
             } else {
+                // Filter empty values
+                if (null === $value) {
+                    continue;
+                }
+
                 foreach ($field->getConfig()->getViewTransformers() as $transformer) {
                     $value = $transformer->transform($value);
                 }
