@@ -79,7 +79,7 @@ class Filter implements FilterInterface
                 /** @var FormInterface $subField */
                 foreach ($field as $subField) {
                     foreach ($subField->getConfig()->getViewTransformers() as $transformer) {
-                        $value[intval($subField->getName())] = $transformer->transform($field[intval($subField->getName())]);
+                        $value[intval($subField->getName())] = $transformer->transform($subField->getData());
                     }
                 }
             } else {
